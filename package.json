@@ -1,0 +1,15 @@
+{
+  "name": "chilledman_social_network",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "author": "Oleh Popovych",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
