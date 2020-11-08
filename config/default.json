@@ -1,3 +1,4 @@
 {
-  "mongoDB_URL": "mongodb+srv://user:password123456@cluster0.gvbrj.mongodb.net/chilledMan?retryWrites=true&w=majority"
+  "mongoDB_URL": "mongodb+srv://user:password123456@cluster0.gvbrj.mongodb.net/chilledMan?retryWrites=true&w=majority",
+  "jwtSecretKey": "Very secret text, be carefully"
 }

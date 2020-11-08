@@ -4,6 +4,10 @@ const config = require('config')
 
 const app = express()
 
+app.use(express.json({extended: true}))
+
+app.use('/api/auth', require('./routes/auth.routes'))
+
 app.get('', async (req, res) => {
     res.send("Main page")
 })
