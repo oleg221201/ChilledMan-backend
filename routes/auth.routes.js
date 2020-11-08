@@ -15,7 +15,7 @@ router.post('/registration',
         try {
             const errors = validationResult(req)
             if (!errors.isEmpty()){
-                return res.json({
+                return res.status(400).json({
                     message: "Invalid register data",
                     err: errors.array()
                 })
@@ -23,15 +23,24 @@ router.post('/registration',
 
             const {email, password, username} = req.body
 
-            if(! await User.findOne({email})){
-                return res.json({message: "User already exists"})
+            const user = await User.findOne({email})
+
+            if(user){
+                return res.status(400).json({message: "User already exists"})
             }
 
             const hashedPassword = await bcrypt.hash(password, 12)
-            await User.create({email, password: hashedPassword, username})
-            res.json({message: "User has been created"})
+            const result = await User.create({email, password: hashedPassword, username})
+
+            const token = jwt.sign(
+                {userId: result._id},
+                config.get('jwtSecretKey'),
+                {expiresIn: "2h"}
+            )
+
+            res.status(201).json({token: token, userId: result._id})
         } catch (err) {
-            res.json({message: "Something go wrong, try again", err: err.message})
+            res.status(400).json({message: "Something go wrong, try again", err: err.message})
         }
     })
 
@@ -44,7 +53,7 @@ router.post('/login',
         try {
             const errors = validationResult(req)
             if (!errors.isEmpty()){
-                return res.json({
+                return res.status(400).json({
                     message: "Invalid login data",
                     err: errors.array()
                 })
@@ -53,12 +62,12 @@ router.post('/login',
             const {email, password} = req.body
             const user = await User.findOne({email})
             if (! user){
-                return res.json({message: "Something go wrong, try again"})
+                return res.status(400).json({message: "Something go wrong, try again"})
             }
 
             const isCorrectPassword = await bcrypt.compare(password, user.password)
             if (!isCorrectPassword){
-                return res.json({message: "Something go wrong, try again"})
+                return res.status(400).json({message: "Something go wrong, try again"})
             }
 
             const token = jwt.sign(
@@ -67,9 +76,9 @@ router.post('/login',
                 {expiresIn: "2h"}
             )
 
-            res.json({token, userId: user._id})
+            res.status(201).json({token, userId: user._id})
         } catch (err) {
-            res.json({message: "Something go wrong, try again", err: err.message})
+            res.status(400).json({message: "Something go wrong, try again", err: err.message})
         }
     })
 
