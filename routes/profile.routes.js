@@ -32,8 +32,8 @@ router.get('/follow/:currentUserId/:followUserId', async (req, res) => {
             return res.status(400).json({message: "Friend with this id already exist"})
         }
 
-        friends.unshift(req.params.followUserId)
-        await User.findByIdAndUpdate(req.params.currentUserId, {friends: friends})
+        await User.findByIdAndUpdate(req.params.currentUserId,
+            {$addToSet: {friends: req.params.followUserId}})
         res.json({message: "Success following"})
     } catch (err){
         res.status(400).json({message: "Something go wrong, try again."})

@@ -8,6 +8,7 @@ app.use(express.json({extended: true}))
 
 app.use('/api/auth', require('./routes/auth.routes'))
 app.use('/api/profile', require('./routes/profile.routes'))
+app.use('/api/post', require('./routes/post.routes'))
 
 app.get('', async (req, res) => {
     res.send("Main page")
