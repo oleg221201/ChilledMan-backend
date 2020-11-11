@@ -7,6 +7,7 @@ const app = express()
 app.use(express.json({extended: true}))
 
 app.use('/api/auth', require('./routes/auth.routes'))
+app.use('/api/profile', require('./routes/profile.routes'))
 
 app.get('', async (req, res) => {
     res.send("Main page")
@@ -17,7 +18,8 @@ async function startApp () {
         await mongoose.connect(config.get("mongoDB_URL"), {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            useCreateIndex: true
+            useCreateIndex: true,
+            useFindAndModify: false
         })
         app.listen(5000, () => {
             console.log("Server has been started on port 5000 ...")
