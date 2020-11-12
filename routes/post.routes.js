@@ -2,6 +2,7 @@ const {Router} = require('express')
 const router = Router()
 const Post = require('../models/Post')
 const Comment = require('../models/Comment')
+const auth = require('../middleware/auth.middleware')
 
 router.get('/:id', async (req, res) => {
     try{
@@ -15,21 +16,20 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-router.post('', async (req, res) => {
+router.post('', auth, async (req, res) => {
     try{
         const post = {
             text: req.body.text,
-            owner: req.body.userId
+            owner: req.user.userId
         }
         const result = await Post.create(post)
         res.json({postId: result.id, message: "Post created successfully"})
     } catch (err) {
-        console.log(err.message)
         res.status(400).json({message: "Something go wrong, try again"})
     }
 })
 
-router.put('', async (req, res) => {
+router.put('', auth, async (req, res) => {
     try {
         let loading = false
         const post = await Post.findById(req.body.postId)
@@ -38,28 +38,28 @@ router.put('', async (req, res) => {
             return res.status(400).json({message: "Something go wrong, try again"})
         }
 
-        if (req.body.text && req.body.userId.toString() === post.owner.toString()){
+        if (req.body.text && req.user.userId.toString() === post.owner.toString()){
             await Post.findByIdAndUpdate(req.body.postId,
                 {text: req.body.text})
             loading = true
         }
 
         if (req.body.comment){
-            const comment = await Comment.create({text: req.body.comment, owner: req.body.userId})
+            const comment = await Comment.create({text: req.body.comment, owner: req.user.userId})
             await Post.findByIdAndUpdate(req.body.postId,
                 {$addToSet: {comments: comment.id}})
             loading = true
         }
 
-        if (req.body.likeUserId){
-            if (post.likes.includes(req.body.likeUserId)){
-                const index = post.likes.indexOf(req.body.likeUserId)
+        if (req.body.like){
+            if (post.likes.includes(req.user.userId)){
+                const index = post.likes.indexOf(req.user.userId)
                 post.likes.splice(index, 1)
                 await Post.findByIdAndUpdate(req.body.postId, {likes: post.likes})
             }
             else {
                 await Post.findByIdAndUpdate(req.body.postId,
-                    {$addToSet: {likes: req.body.likeUserId}})
+                    {$addToSet: {likes: req.user.userId}})
             }
             loading = true
         }
