@@ -1,6 +1,7 @@
 const {Router} = require('express')
 const router = Router()
 const User = require("../models/User")
+const Post = require('../models/Post')
 const auth = require('../middleware/auth.middleware')
 
 router.get("/", auth, async (req, res) => {
@@ -17,6 +18,26 @@ router.get("/", auth, async (req, res) => {
         res.json({user: data})
     } catch (err) {
       res.status(400).json({message: "Something go wrong, try again"})
+    }
+})
+
+router.get('/news' , auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId)
+        if (!user.friends) return res.status(400).json({message: "No friends"})
+
+        let postsId = {postsIdArray: []}
+
+        for (let i=0; i<user.friends.length; i++){
+            let friend = await User.findById(user.friends[i])
+            for(let j=0; j<friend.posts.length; j++){
+                postsId.postsIdArray.push(friend.posts[j]._id)
+            }
+        }
+        res.json({postsId: postsId})
+    } catch (err) {
+        console.log(err.message)
+        res.status(400).json({message: "Something go wrong, try again"})
     }
 })
 
