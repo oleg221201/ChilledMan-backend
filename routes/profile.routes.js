@@ -26,15 +26,16 @@ router.get('/news' , auth, async (req, res) => {
         const user = await User.findById(req.user.userId)
         if (!user.friends) return res.status(400).json({message: "No friends"})
 
-        let postsId = {postsIdArray: []}
+        let postsData = {postsDataArray: []}
 
         for (let i=0; i<user.friends.length; i++){
             let friend = await User.findById(user.friends[i])
             for(let j=0; j<friend.posts.length; j++){
-                postsId.postsIdArray.push(friend.posts[j]._id)
+                let post = await Post.findById(friend.posts[j]._id)
+                postsData.postsDataArray.push(post)
             }
         }
-        res.json({postsId: postsId})
+        res.json({postsData: postsData})
     } catch (err) {
         console.log(err.message)
         res.status(400).json({message: "Something go wrong, try again"})
