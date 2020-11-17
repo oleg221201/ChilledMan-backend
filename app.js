@@ -22,8 +22,8 @@ async function startApp () {
             useCreateIndex: true,
             useFindAndModify: false
         })
-        app.listen(5000, () => {
-            console.log("Server has been started on port 5000 ...")
+        app.listen(4000, () => {
+            console.log("Server has been started on port 4000 ...")
         })
     } catch (err) {
         console.log("Error", err.message)

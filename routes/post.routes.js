@@ -17,6 +17,18 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+router.get('/comment/:id', async (req, res) => {
+    try{
+        const comment = await Comment.findById(req.params.id)
+        if (! comment) {
+            return res.status(400).json({message: "No comment with this id"})
+        }
+        res.json({comment: comment})
+    } catch (err) {
+        res.status(400).json({message: "Something go wrong, try again"})
+    }
+})
+
 router.post('', auth, async (req, res) => {
     try{
         const post = {
@@ -76,11 +88,14 @@ router.put('', auth, async (req, res) => {
 
 router.delete('/:id', auth, async (req, res) => {
     try {
-        await Post.findByIdAndDelete(req.params.id)
+        const post = await Post.findByIdAndDelete(req.params.id)
+        post.comments.forEach(async (comment) => {
+            await Comment.findByIdAndDelete(comment)
+        })
         const user = await User.findById(req.user.userId)
         let posts = user.posts
         const index = posts.indexOf(req.params.id)
-        posts = posts.splice(index, 1)
+        posts.splice(index, 1)
         await User.findByIdAndUpdate(req.user.userId, {posts: posts})
         res.json({message: "Post deleted successfully"})
     } catch (err) {

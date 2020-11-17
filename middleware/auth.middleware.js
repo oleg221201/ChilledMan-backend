@@ -13,6 +13,6 @@ module.exports = (req, res, next) => {
         req.user = verify
         next()
     }catch (err) {
-        res.status(400).json({message: 'No authorization'})
+        res.status(400).json({err: err.message, message: 'No authorization'})
     }
 }

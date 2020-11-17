@@ -17,9 +17,11 @@ router.get("/", auth, async (req, res) => {
         }
         res.json({user: data})
     } catch (err) {
-      res.status(400).json({message: "Something go wrong, try again"})
+      res.status(400).json({message: "Something go wrong, try again 1"})
     }
 })
+
+
 
 router.get('/news' , auth, async (req, res) => {
     try {
@@ -35,10 +37,28 @@ router.get('/news' , auth, async (req, res) => {
                 postsData.postsDataArray.push(post)
             }
         }
+        postsData.postsDataArray.reverse()
         res.json({postsData: postsData})
     } catch (err) {
+        res.status(400).json({err: err.message, message: "Something go wrong, try again"})
+    }
+})
+
+router.get("/:id", auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+
+        if (!user) {return res.status(400).json({message: "Data error, no user with this id"})}
+
+        const data = {
+            username: user.username,
+            friends: user.friends,
+            posts: user.posts
+        }
+        res.json({user: data})
+    } catch (err) {
         console.log(err.message)
-        res.status(400).json({message: "Something go wrong, try again"})
+        res.status(400).json({message: "Something go wrong, try again 2"})
     }
 })
 
@@ -59,7 +79,7 @@ router.get('/follow/:followUserId', auth, async (req, res) => {
             {$addToSet: {friends: req.params.followUserId}})
         res.json({message: "Success following"})
     } catch (err){
-        res.status(400).json({message: "Something go wrong, try again."})
+        res.status(400).json({message: "Something go wrong, try again"})
     }
 })
 
