@@ -35,7 +35,7 @@ router.post('/registration',
             const token = jwt.sign(
                 {userId: result._id},
                 config.get('jwtSecretKey'),
-                {expiresIn: "2h"}
+                {expiresIn: "96h"}
             )
 
             res.status(201).json({token: token, userId: result._id})
@@ -73,7 +73,7 @@ router.post('/login',
             const token = jwt.sign(
                 {userId: user._id},
                 config.get('jwtSecretKey'),
-                {expiresIn: "2h"}
+                {expiresIn: "96h"}
             )
 
             res.status(201).json({token, userId: user._id})

@@ -17,11 +17,18 @@ router.get("/", auth, async (req, res) => {
         }
         res.json({user: data})
     } catch (err) {
-      res.status(400).json({message: "Something go wrong, try again 1"})
+      res.status(400).json({message: "Something go wrong, try again"})
     }
 })
 
-
+router.get('/users', auth, async (req, res) => {
+    try{
+        const users = await User.find({})
+        res.json({users: users})
+    } catch (err){
+        res.status(400).json({message: "Something go wrong, try again"})
+    }
+})
 
 router.get('/news' , auth, async (req, res) => {
     try {
@@ -51,6 +58,7 @@ router.get("/:id", auth, async (req, res) => {
         if (!user) {return res.status(400).json({message: "Data error, no user with this id"})}
 
         const data = {
+            id: user._id,
             username: user.username,
             friends: user.friends,
             posts: user.posts
@@ -58,7 +66,7 @@ router.get("/:id", auth, async (req, res) => {
         res.json({user: data})
     } catch (err) {
         console.log(err.message)
-        res.status(400).json({message: "Something go wrong, try again 2"})
+        res.status(400).json({message: "Something go wrong, try again"})
     }
 })
 
@@ -72,7 +80,7 @@ router.get('/follow/:followUserId', auth, async (req, res) => {
         }
 
         if (friends.includes(req.params.followUserId)) {
-            return res.status(400).json({message: "Friend with this id already exist"})
+            return res.status(400).json({message: "User with this id already exist"})
         }
 
         await User.findByIdAndUpdate(req.user.userId,
