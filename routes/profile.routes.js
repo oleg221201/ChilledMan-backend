@@ -13,7 +13,7 @@ router.get("/", auth, async (req, res) => {
         const data = {
             username: user.username,
             friends: user.friends,
-            posts: user.posts
+            posts: user.posts.reverse()
         }
         res.json({user: data})
     } catch (err) {
@@ -37,13 +37,22 @@ router.get('/news' , auth, async (req, res) => {
 
         let postsData = {postsDataArray: []}
 
-        for (let i=0; i<user.friends.length; i++){
-            let friend = await User.findById(user.friends[i])
-            for(let j=0; j<friend.posts.length; j++){
-                let post = await Post.findById(friend.posts[j]._id)
-                postsData.postsDataArray.push(post)
+        // for (let i=0; i<user.friends.length; i++){
+        //     let friend = await User.findById(user.friends[i])
+        //     for(let j=0; j<friend.posts.length; j++){
+        //         let post = await Post.findById(friend.posts[j]._id)
+        //         postsData.postsDataArray.push(post)
+        //     }
+        // }
+
+        const posts = await Post.find({})
+        if (!posts) return res.status(400).json({message: "No posts"})
+        for (let i=0; i<posts.length; i++){
+            if(user.friends.includes(posts[i].owner) || posts[i].owner == req.user.userId){
+                postsData.postsDataArray.push(posts[i])
             }
         }
+
         postsData.postsDataArray.reverse()
         res.json({postsData: postsData})
     } catch (err) {
